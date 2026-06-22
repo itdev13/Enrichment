@@ -1,0 +1,34 @@
+{
+  "name": "enrichflow-api",
+  "version": "0.1.0",
+  "description": "EnrichFlow - GoHighLevel marketplace app for contact data enrichment (waterfall providers, usage-based billing)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "enrich:local": "node scripts/test-enrich-local.js"
+  },
+  "keywords": [
+    "gohighlevel",
+    "ghl",
+    "marketplace",
+    "contact-enrichment",
+    "enrichflow"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.7.0",
+    "winston": "^3.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
