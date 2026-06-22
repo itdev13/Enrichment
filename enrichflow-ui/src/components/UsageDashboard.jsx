@@ -53,26 +53,34 @@ export default function UsageDashboard({ locationId, sub }) {
               <tr>
                 <th>Contact</th>
                 <th className="tiny">Result</th>
-                <th className="tiny">Credits</th>
+                <th className="tiny">Credits used</th>
                 <th className="tiny">Written to CRM</th>
                 <th className="tiny">Date</th>
               </tr>
             </thead>
             <tbody>
-              {recent.map((r) => (
-                <tr key={r._id}>
-                  <td>
-                    <span style={{ fontWeight: 500 }}>{r.contactName || r.contactEmail || r.contactId || 'manual'}</span>
-                    {r.contactName && r.contactEmail && (
-                      <span style={{ color: 'var(--muted)', fontSize: 11.5, marginLeft: 6 }}>{r.contactEmail}</span>
-                    )}
-                  </td>
-                  <td className="tiny">{r.matched ? <span className="tag green">Matched</span> : <span className="tag gray">No match</span>}</td>
-                  <td className="tiny">{r.credits}</td>
-                  <td className="tiny">{r.writtenToGhl ? <span className="tag green">yes</span> : <span style={{ color: 'var(--muted)' }}>—</span>}</td>
-                  <td className="tiny muted">{new Date(r.createdAt).toLocaleString()}</td>
-                </tr>
-              ))}
+              {recent.map((r) => {
+                const email = r.contactEmail || r.input?.email;
+                const displayName = r.contactName || email || '—';
+                const showEmail = r.contactName && email;
+                return (
+                  <tr key={r._id}>
+                    <td>
+                      <div style={{ fontWeight: 500, fontSize: 13.5 }}>{displayName}</div>
+                      {showEmail && (
+                        <div style={{ color: 'var(--muted)', fontSize: 12, marginTop: 1 }}>{email}</div>
+                      )}
+                      {r.contactId && (
+                        <div style={{ color: 'var(--muted)', fontSize: 11, marginTop: 1, fontFamily: 'monospace' }}>{r.contactId}</div>
+                      )}
+                    </td>
+                    <td className="tiny">{r.matched ? <span className="tag green">Matched</span> : <span className="tag gray">No match</span>}</td>
+                    <td className="tiny" style={{ fontWeight: 600 }}>{r.credits}</td>
+                    <td className="tiny">{r.writtenToGhl ? <span className="tag green">Yes</span> : <span style={{ color: 'var(--muted)' }}>—</span>}</td>
+                    <td className="tiny muted">{new Date(r.createdAt).toLocaleString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
