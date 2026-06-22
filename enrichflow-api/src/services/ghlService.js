@@ -202,6 +202,16 @@ class GHLService {
     return res.contact || res;
   }
 
+  /** GET /locations/:id — fetch location details (name, etc). */
+  async getLocation(locationId) {
+    try {
+      const res = await this.apiRequest('GET', `/locations/${locationId}`, locationId);
+      return res.location || res;
+    } catch {
+      return null;
+    }
+  }
+
   /** GET /contacts/ — list contacts for a location (UI bulk-enrich picker). */
   async searchContacts(locationId, { limit = 20, query, startAfterId, startAfter } = {}) {
     const params = { locationId, limit };

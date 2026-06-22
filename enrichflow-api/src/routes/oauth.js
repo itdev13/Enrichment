@@ -122,7 +122,8 @@ router.get('/status', async (req, res) => {
   // A direct location-scoped token means we're connected.
   const locationToken = await OAuthToken.findOne({ locationId, tokenType: 'location', isActive: true });
   if (locationToken) {
-    return res.json({ success: true, connected: true, via: 'location-token' });
+    const loc = await ghlService.getLocation(locationId);
+    return res.json({ success: true, connected: true, via: 'location-token', locationName: loc?.name || null });
   }
 
   // Agency installs only yield a company token up front; the location token is minted on demand
@@ -131,7 +132,8 @@ router.get('/status', async (req, res) => {
   const companyToken = await OAuthToken.findOne({ tokenType: 'company', isActive: true });
   const installation = await Installation.findOne({ locationId, status: 'active' });
   if (companyToken && installation) {
-    return res.json({ success: true, connected: true, via: 'company-token' });
+    const loc = await ghlService.getLocation(locationId);
+    return res.json({ success: true, connected: true, via: 'company-token', locationName: loc?.name || null });
   }
 
   return res.json({ success: true, connected: false });

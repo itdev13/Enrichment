@@ -95,6 +95,8 @@ async function runEnrichment(opts = {}) {
       locationId,
       companyId: contact?.companyId,
       contactId,
+      contactName: contact ? (contact.name || [contact.firstName, contact.lastName].filter(Boolean).join(' ') || null) : null,
+      contactEmail: contact?.email || null,
       input,
       data: result.data,
       matched: result.matched,

@@ -39,7 +39,7 @@ router.get('/usage', async (req, res) => {
     const recent = await EnrichmentRecord.find({ locationId })
       .sort({ createdAt: -1 })
       .limit(10)
-      .select('contactId matched credits tiers writtenToGhl charged createdAt')
+      .select('contactId contactName contactEmail matched credits tiers writtenToGhl charged createdAt')
       .lean();
 
     const creditsUsed = agg?.creditsUsed || 0;

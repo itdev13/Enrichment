@@ -56,16 +56,19 @@ body {
 .header .loc-label {
   font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.8; font-weight: 600;
 }
-.header .loc code {
+.header .loc-name {
+  display: flex; align-items: center; gap: 6px;
   background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.22);
-  padding: 4px 10px; border-radius: 8px; font-size: 12px; cursor: pointer;
-  backdrop-filter: blur(4px); transition: background 0.15s ease;
+  padding: 5px 11px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; backdrop-filter: blur(4px); transition: background 0.15s ease;
+  max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.header .loc code:hover { background: rgba(255,255,255,0.28); }
+.header .loc-name:hover { background: rgba(255,255,255,0.28); }
+.header .loc-name svg { opacity: 0.75; flex-shrink: 0; }
 .header .loc-set {
   cursor: pointer; color: #fff; font-weight: 600; font-size: 13px;
   background: rgba(255,255,255,0.18); padding: 7px 14px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.3); transition: background 0.15s ease;
 }
 .header .loc-set:hover { background: rgba(255,255,255,0.3); }
 
@@ -80,9 +83,9 @@ body {
 
 /* Cards */
 .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
-.card h2 { font-size: 15px; margin: 0 0 4px; }
-.card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 16px; }
+  padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.card h2 { font-size: 15.5px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.01em; }
+.card .sub { color: var(--muted); font-size: 12.5px; margin: 0 0 18px; line-height: 1.5; }
 
 /* Forms */
 .field { margin-bottom: 12px; }
@@ -124,16 +127,18 @@ button.btn.ghost { background: #fff; color: var(--primary); border: 1px solid va
 /* Stats */
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 16px; box-shadow: var(--shadow); }
-.stat .label { font-size: 12px; color: var(--muted); }
-.stat .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  padding: 18px 20px; box-shadow: var(--shadow); }
+.stat .label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.stat .value { font-size: 26px; font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; color: var(--text); }
 
 /* Table */
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); }
-th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); font-weight: 600; }
+th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid var(--border); }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; background: #f9fafc; }
+tbody tr:hover { background: #fafbff; }
+tbody tr:last-child td { border-bottom: none; }
 td.tiny, th.tiny { width: 1%; white-space: nowrap; }
-.tag { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+.tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 700; }
 .tag.green { background: var(--green-bg); color: var(--green); }
 .tag.gray { background: #f1f3f7; color: var(--muted); }
 

@@ -61,10 +61,15 @@ export default function UsageDashboard({ locationId, sub }) {
             <tbody>
               {recent.map((r) => (
                 <tr key={r._id}>
-                  <td><code style={{ fontSize: 12 }}>{r.contactId || 'manual'}</code></td>
+                  <td>
+                    <span style={{ fontWeight: 500 }}>{r.contactName || r.contactEmail || r.contactId || 'manual'}</span>
+                    {r.contactName && r.contactEmail && (
+                      <span style={{ color: 'var(--muted)', fontSize: 11.5, marginLeft: 6 }}>{r.contactEmail}</span>
+                    )}
+                  </td>
                   <td className="tiny">{r.matched ? <span className="tag green">matched</span> : <span className="tag gray">no match</span>}</td>
                   <td className="tiny">{r.credits}</td>
-                  <td className="tiny">{r.writtenToGhl ? 'yes' : '—'}</td>
+                  <td className="tiny">{r.writtenToGhl ? <span className="tag green">yes</span> : <span style={{ color: 'var(--muted)' }}>—</span>}</td>
                   <td className="tiny muted">{new Date(r.createdAt).toLocaleString()}</td>
                 </tr>
               ))}
