@@ -47,7 +47,8 @@ class EnrichFlowApp {
           origin.includes('trycloudflare.com') ||
           origin.includes('ngrok') ||
           origin.includes('localhost') ||
-          origin.includes('127.0.0.1');
+          origin.includes('127.0.0.1') ||
+          origin.includes('vercel.app');
         return trusted ? callback(null, true) : callback(new Error('Not allowed by CORS'));
       },
       credentials: true
