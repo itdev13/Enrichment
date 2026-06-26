@@ -27,6 +27,7 @@ const subscriptionSchema = new mongoose.Schema(
     },
 
     includedCredits: { type: Number, default: 0 }, // monthly allowance
+    overageRateUsd: { type: Number, default: null }, // per-credit overage rate for this plan
     creditsUsedThisPeriod: { type: Number, default: 0 },
 
     currentPeriodStart: Date,

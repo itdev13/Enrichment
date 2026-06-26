@@ -92,10 +92,13 @@ class SubscriptionService {
     const now = new Date();
 
     // Trial → status 'trialing', period ends at trialStart + trialDuration days.
+    // Trial gets a reduced credit allowance (TRIAL_CREDITS env, default 50).
     let resolvedStatus = status;
     let periodEnd;
+    let isTrial = false;
     if (!resolvedStatus && trial?.onTrial) {
       resolvedStatus = 'trialing';
+      isTrial = true;
       const start = trial.trialStartDate ? new Date(trial.trialStartDate) : now;
       periodEnd = new Date(start.getTime() + (Number(trial.trialDuration) || 0) * 24 * 60 * 60 * 1000);
     }
@@ -116,9 +119,10 @@ class SubscriptionService {
         companyId,
         appId,
         planId,
-        planName: p.name,
+        planName: isTrial ? `${p.name} (Trial)` : p.name,
         priceUsd: p.priceUsd,
-        includedCredits: p.includedCredits,
+        includedCredits: isTrial ? Number(process.env.TRIAL_CREDITS || 50) : p.includedCredits,
+        overageRateUsd: p.overageRateUsd ?? null,
         status: resolvedStatus,
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
@@ -153,7 +157,7 @@ class SubscriptionService {
       entitled: isRequired() ? sub.isEntitled() : true,
       required: isRequired(),
       status: sub.status,
-      plan: { name: sub.planName, priceUsd: sub.priceUsd, includedCredits: sub.includedCredits },
+      plan: { name: sub.planName, priceUsd: sub.priceUsd, includedCredits: sub.includedCredits, overageRateUsd: sub.overageRateUsd ?? null },
       includedCredits: sub.includedCredits,
       creditsUsedThisPeriod: sub.creditsUsedThisPeriod,
       remainingIncluded: sub.remainingIncluded(),

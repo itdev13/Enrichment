@@ -69,11 +69,13 @@ async function runEnrichment(opts = {}) {
   }
 
   // Billing: monthly plan covers "included" credits first; only the overage hits the wallet.
-  let billing = { charged: false, amount: billingService.priceFor(result.credits), credits: result.credits };
+  const subStatus = locationId ? await subscriptionService.getStatus(locationId) : null;
+  const overageRateUsd = subStatus?.plan?.overageRateUsd ?? null;
+  let billing = { charged: false, amount: billingService.priceFor(result.credits, overageRateUsd), credits: result.credits };
   if (locationId && result.credits > 0) {
     const { coveredByPlan, overage } = await subscriptionService.consumeIncluded(locationId, result.credits);
     if (overage > 0) {
-      const wallet = await chargeForRun({ locationId, credits: overage, contactId });
+      const wallet = await chargeForRun({ locationId, credits: overage, contactId, overageRateUsd });
       billing = { ...wallet, credits: result.credits, coveredByPlan, overageCredits: overage };
     } else {
       billing = {
@@ -114,8 +116,8 @@ async function runEnrichment(opts = {}) {
   return { recordId, writtenToGhl, billing, ...result };
 }
 
-async function chargeForRun({ locationId, credits, contactId }) {
-  const fallback = { charged: false, amount: billingService.priceFor(credits), credits };
+async function chargeForRun({ locationId, credits, contactId, overageRateUsd }) {
+  const fallback = { charged: false, amount: billingService.priceFor(credits, overageRateUsd), credits };
   if (!database.isConnected()) return { ...fallback, skipped: 'no_database' };
   try {
     const OAuthToken = require('../models/OAuthToken');
@@ -130,6 +132,7 @@ async function chargeForRun({ locationId, credits, contactId }) {
       locationId,
       accessToken,
       credits,
+      overageRateUsd,
       eventId: `${contactId || 'manual'}_${Date.now()}`,
       description: `EnrichFlow enrichment (${credits} credits)`
     });

@@ -97,22 +97,40 @@ function PlanCard({ sub }) {
   const pct = included > 0 ? Math.min(100, Math.round((used / included) * 100)) : 0;
   const active = sub.entitled;
 
+  const isTrial = sub.status === 'trialing';
+  const daysLeft = sub.currentPeriodEnd
+    ? Math.max(0, Math.ceil((new Date(sub.currentPeriodEnd) - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
+
   return (
     <div className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <h2 style={{ margin: 0 }}>{sub.plan.name} plan · ${sub.plan.priceUsd}/mo</h2>
-        <span className={`tag ${active ? 'green' : 'gray'}`}>{sub.status || (active ? 'active' : 'inactive')}</span>
+        <div>
+          <h2 style={{ margin: 0 }}>{sub.plan.name} · ${sub.plan.priceUsd}/mo</h2>
+          {isTrial && (
+            <span style={{ fontSize: 11.5, color: 'var(--amber)', fontWeight: 600, marginTop: 3, display: 'block' }}>
+              Free trial — {daysLeft !== null ? `${daysLeft} day${daysLeft === 1 ? '' : 's'} left` : 'limited time'}
+            </span>
+          )}
+        </div>
+        <span className={`tag ${isTrial ? 'gray' : active ? 'green' : 'gray'}`} style={isTrial ? { background: '#fffbeb', color: 'var(--amber)' } : {}}>
+          {isTrial ? 'Trial' : sub.status || (active ? 'Active' : 'Inactive')}
+        </span>
       </div>
-      <p className="sub">Included credits reset monthly. Usage beyond the allowance is billed per credit.</p>
+      <p className="sub" style={{ marginBottom: 12 }}>
+        {isTrial
+          ? `${included} trial credits included. Upgrade to a paid plan for full access.`
+          : `Included credits reset monthly. Overage billed at $${sub.plan.overageRateUsd ?? '0.03'}/credit.`}
+      </p>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 6 }}>
-        <span className="muted">{used} / {included} included credits used</span>
-        <span className="muted">{remaining} left</span>
+        <span className="muted">{used} / {included} credits used</span>
+        <span className="muted" style={{ fontWeight: 600, color: remaining < 10 ? 'var(--red)' : 'inherit' }}>{remaining} left</span>
       </div>
       <div style={{ height: 8, background: '#eef0f6', borderRadius: 6, overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: pct >= 100 ? 'var(--amber)' : 'var(--primary)' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: pct >= 90 ? 'var(--amber)' : 'var(--primary)', transition: 'width 0.3s ease' }} />
       </div>
-      {sub.currentPeriodEnd && (
+      {!isTrial && sub.currentPeriodEnd && (
         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
           Renews {new Date(sub.currentPeriodEnd).toLocaleDateString()}
         </p>

@@ -9,7 +9,7 @@ const logger = require('../utils/logger');
  * never moves money. The credit -> dollar conversion is a single retail knob (CREDIT_PRICE_USD).
  */
 
-const CREDIT_PRICE_USD = Number(process.env.CREDIT_PRICE_USD || 0.05); // retail $/credit
+const DEFAULT_CREDIT_PRICE_USD = Number(process.env.CREDIT_PRICE_USD || 0.03);
 const METER_ID = process.env.GHL_METER_ID || '';
 const APP_ID = process.env.GHL_APP_ID || '';
 
@@ -22,9 +22,10 @@ class BillingService {
     return String(process.env.BILLING_ENABLED).toLowerCase() === 'true';
   }
 
-  /** Dollar amount for a credit count. */
-  priceFor(credits) {
-    return Number((credits * CREDIT_PRICE_USD).toFixed(4));
+  /** Dollar amount for a credit count, using plan-specific rate if provided. */
+  priceFor(credits, rateUsd) {
+    const rate = rateUsd ?? DEFAULT_CREDIT_PRICE_USD;
+    return Number((credits * rate).toFixed(4));
   }
 
   /** Check the agency wallet has funds (skips when billing disabled). */
@@ -46,8 +47,9 @@ class BillingService {
    * Charge the wallet for an enrichment run.
    * @returns {{ charged: boolean, amount: number, credits: number, chargeId?: string, skipped?: string }}
    */
-  async chargeCredits({ companyId, locationId, accessToken, credits, eventId, description }) {
-    const amount = this.priceFor(credits);
+  async chargeCredits({ companyId, locationId, accessToken, credits, eventId, description, overageRateUsd }) {
+    const rate = overageRateUsd ?? DEFAULT_CREDIT_PRICE_USD;
+    const amount = this.priceFor(credits, rate);
 
     if (credits <= 0) return { charged: false, amount: 0, credits, skipped: 'zero_credits' };
 
@@ -68,7 +70,7 @@ class BillingService {
           companyId,
           meterId: METER_ID,
           units: credits,
-          price: CREDIT_PRICE_USD,
+          price: rate,
           appId: APP_ID,
           eventId,
           locationId,
