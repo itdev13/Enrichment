@@ -54,6 +54,8 @@ class PDLProvider extends BaseProvider {
       });
       console.log("response: ", JSON.parse(res));
     } catch (error) {
+      console.log("error: ", JSON.parse(error));
+
       // PDL returns 404 when no person matches — treat as a clean "no match", not an error.
       if (error.response?.status === 404) return this.empty();
       throw error;
