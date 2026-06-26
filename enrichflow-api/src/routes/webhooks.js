@@ -180,8 +180,9 @@ router.post('/enrichflow', async (req, res) => {
 
       // ── PlanChange ──────────────────────────────────────────────────────────
       case 'PLAN_CHANGE': {
-        const newPlanId = data.newPlanId || data.planId;
-        const oldPlanId = data.oldPlanId || data.previousPlanId || null;
+        // GHL payload: { newPlanId, currentPlanId, ... }
+        const newPlanId = data.newPlanId;
+        const oldPlanId = data.currentPlanId || data.oldPlanId || data.previousPlanId || null;
         const changedSub = await subscriptionService.activate({
           locationId, companyId, appId,
           planId: newPlanId,
@@ -201,30 +202,23 @@ router.post('/enrichflow', async (req, res) => {
           webhookType: type,
           rawData: data
         });
-        logger.info('🔁 Plan changed', { locationId, companyId, newPlanId });
+        logger.info('🔁 Plan changed', { locationId, companyId, newPlanId, oldPlanId });
         break;
       }
 
       // ── SaaSPlanCreate ──────────────────────────────────────────────────────
-      case 'SAAS_PLAN_CREATE':
-      case 'SUBSCRIPTION_CREATED': {
-        const saaSub = await subscriptionService.activate({
-          locationId, companyId, appId,
+      // This fires when YOU create a new plan in the marketplace — NOT when a user subscribes.
+      // No locationId. Just log it so you know to update PLANS_JSON with the new planId.
+      case 'SaasPlanCreate':
+      case 'SAAS_PLAN_CREATE': {
+        const priceUsd = data.prices?.find(p => p.billingInterval === 'month' && p.active)?.amount;
+        logger.info('📋 New SaaS plan created in marketplace — update PLANS_JSON', {
           planId: data.planId,
-          trial: data.trial,
-          status: 'active',
-          raw: data
+          title: data.title,
+          priceUsd: priceUsd ? priceUsd / 100 : null,
+          trialPeriod: data.trialPeriod,
+          companyId
         });
-        await recordSubscriptionTx({
-          event: 'new_subscription',
-          locationId, companyId, appId,
-          planId: data.planId,
-          periodStart: saaSub?.currentPeriodStart,
-          periodEnd: saaSub?.currentPeriodEnd,
-          webhookType: type,
-          rawData: data
-        });
-        logger.info('💳 SaaS plan created', { locationId, planId: data.planId });
         break;
       }
 
