@@ -1,5 +1,6 @@
 const axios = require('axios');
 const BaseProvider = require('./baseProvider');
+const logger = require('../../utils/logger');
 
 /**
  * People Data Labs — premium fallback (used for phone numbers and misses the primary can't fill).
@@ -52,10 +53,12 @@ class PDLProvider extends BaseProvider {
         headers: { 'X-Api-Key': this.apiKey },
         timeout: 15000
       });
-      console.log("response: ", JSON.parse(res));
+      logger.info('PDL response', { status: res.status, likelihood: res.data?.likelihood });
     } catch (error) {
-      console.log("error: ", JSON.parse(error));
-
+      logger.warn('PDL request failed', {
+        status: error.response?.status,
+        message: error.response?.data?.error?.message || error.message
+      });
       // PDL returns 404 when no person matches — treat as a clean "no match", not an error.
       if (error.response?.status === 404) return this.empty();
       throw error;
