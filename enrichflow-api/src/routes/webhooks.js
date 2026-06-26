@@ -23,6 +23,7 @@ router.post('/enrichflow', async (req, res) => {
   const { type, appId, companyId, locationId } = data;
 
   logger.info('📥 Webhook received', { type, appId, companyId, locationId });
+  logger.info('📦 Webhook payload', { payload: JSON.stringify(data) });
 
   // Always acknowledge quickly — GHL retries on non-2xx
   if (!type || !appId) {
