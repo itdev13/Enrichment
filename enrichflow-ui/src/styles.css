@@ -99,7 +99,8 @@ body {
 
 button.btn {
   background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 8px;
-  font-size: 13.5px; font-weight: 600; cursor: pointer;
+  font-size: 13.5px; font-weight: 600; cursor: pointer; min-width: 120px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
 }
 button.btn:hover { background: var(--primary-dark); }
 button.btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -147,6 +148,7 @@ td.tiny, th.tiny { width: 1%; white-space: nowrap; }
 .error { color: var(--red); font-size: 13px; margin-top: 10px; }
 .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4);
   border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -2px; }
+.btn.ghost .spinner { border-color: rgba(99,102,241,0.3); border-top-color: var(--primary); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .checkbox-cell { width: 1%; }

@@ -60,30 +60,46 @@ async function enrich(input, opts = {}) {
   const force = opts.force || !!(opts.primary || opts.fallback);
   const chain = buildChain(opts);
 
+  logger.info('🔍 Enrichment started', {
+    chain,
+    identifiers: Object.keys(input).filter(k => input[k])
+  });
+
   const merged = {};
   const attempts = [];
   let workingInput = { ...input };
 
   for (const name of chain) {
-    if (isComplete(merged)) break;
+    if (isComplete(merged)) {
+      logger.info(`⏭️ [${name}] skipped — data already complete`);
+      break;
+    }
 
     const provider = resolveProvider(name);
     if (!force && typeof provider.canMatch === 'function' && !provider.canMatch(workingInput)) {
+      logger.info(`⏭️ [${name}] skipped — no usable identifier`);
       attempts.push({ provider: name, status: 'skipped', reason: 'no_usable_identifier' });
       continue;
     }
 
+    logger.info(`🌐 [${name}] calling provider...`);
     await runProvider(name, workingInput, merged, attempts);
+    const last = attempts[attempts.length - 1];
+    logger.info(`${last?.status === 'matched' ? '✅' : '❌'} [${name}] result: ${last?.status}`, {
+      fieldsFound: last?.fieldsFound || [],
+      error: last?.error || undefined
+    });
     workingInput = foldIdentifiers(workingInput, merged);
   }
 
   const credits = computeCredits(merged);
   const matched = credits.fieldsFound.length > 0;
 
-  logger.info('Enrichment complete', {
+  logger.info('🏁 Enrichment complete', {
     matched,
     credits: credits.credits,
     tiers: credits.tiers,
+    fieldsFound: credits.fieldsFound,
     providers: attempts.map((a) => `${a.provider}:${a.status}`).join(',')
   });
 
